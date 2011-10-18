@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+
+<!--
+  Google HTML5 slide template
+
+  Authors: Luke Mahé (code)
+           Marcin Wichary (code and design)
+
+           Dominic Mazzoni (browser compatibility)
+           Charles Chen (ChromeVox support)
+
+  URL: http://code.google.com/p/html5slides/
+-->
+
+<html>
+  <head>
+    <title>Javascript Patterns</title>
+    <meta charset='utf-8'/>
+    <script src='http://html5slides.googlecode.com/svn/trunk/slides.js'></script>
+  </head>
+  <style>
+    body {
+      display: none;
+    }
+  </style>
+  <body>
+    <section class='slides layout-regular'>
+      <article>
+        <h1>Javascript Code Patterns:</h1>
+        <h4>Modules</h4>
+      </article>
+
+      <article>
+        <h3>Ever seen/written code like this?</h3>
+        <pre>
+
+          $(function() {
+            function doSomething() {
+              // ...
+            };
+
+            function doSomethingElse() {
+              // ...
+            };
+
+            $("#some-link").click(function(event) {
+              event.preventDefault();
+              doSomething();
+              $.post(url, data, function(stuff) {
+                // do something with stuff
+                doSomethingElse();
+              });
+            };
+          });
+        </pre>
+      </article>
+
+      <article>
+        <h3>Basic Implementation</h3>
+        <pre>
+          var Awesome = (function($) {
+            var self = {}, marquee = $('<'+'marquee'+'>');
+
+            var makeItPink = function(el) {
+              el.find("a, p, div").css("color", "#FFOCC");
+            };
+
+            self.pinkMarquee = function(selector) {
+              $(selector).appendTo(marquee);
+              markeItPink();
+              return marquee;
+            };
+            return self;
+          }(jQuery));
+        </pre>
+
+        <pre>
+
+          Awesome.pinkMarquee("#my-link");
+        </pre>
+      </article>
+
+      <article>
+        <h4>Pros</h4>
+        <ul>
+          <li>Public/Private functions</li>
+          <li>Friendly to global namespace</li>
+          <li>Organization</li>
+          <li>Protect against naming conflicts</li>
+        </ul>
+        <h4>Cons</h4>
+        <ul>
+          <li>Module doesn't exist across files!!!</li>
+        </ul>
+      </article>
+
+      <article>
+        <h3>Shared Awesomeness</h3>
+        <pre>
+          var Awesome = (function(self, $) {
+            var marquee = $('<'+'marquee'+'>');
+
+            var makeItPink = function(el) {
+              el.find("a, p, div").css("color", "#FFOCC");
+            };
+
+            self.pinkMarquee = function(selector) {
+              $(selector).appendTo(marquee);
+              markeItPink(marquee);
+              return marquee;
+            };
+
+            return self;
+          }(Awesome || {}, jQuery));
+        </pre>
+      </article>
+
+      <article>
+        <h3>Let's get <em>more</em> Awesome in another file?</h3>
+        <pre>
+
+          // in another file...
+          var Awesome = (function(self, $) {
+            var blink = $('<'+'blink'+'>');
+
+            self.pinkBlink = function(selector) {
+              $(selector).appendTo(blink);
+              makeItPink(blink);
+              return blink;
+            };
+            return self;
+          }(Awesome || {}, jQuery));
+        </pre>
+        <pre>
+          Awesome.pinkMarquee("#my-awesome-marquee");
+          Awesome.pinkBlink("#my-awesome-blink");
+        </pre>
+      </article>
+
+      <article>
+        <h4>Features</h4>
+        <ul>
+          <li>Everything our basic implementation had</li>
+          <li>Able to be Augmented across files</li>
+          <li>Private state is not shared across files</li>
+        </ul>
+      </article>
+
+      <article>
+        <h3>Sub Modules</h3>
+        <pre>
+          var Awesome.sauce = (function(parent) {
+            var awesomeSauce = parent.sauce = parent.sauce || {};
+
+            var privateFunc = function() {
+              // ...
+            };
+
+            awesomeSauce.publicFunc = function() {
+              // ...
+            };
+
+            return self;
+          }(Awesome || {}));
+        </pre>
+      </article>
+
+      <article>
+        <h3>Public API Variation</h3>
+        <pre>
+
+        var Awesome = (function(parent) {
+          var privateProp = 42;
+
+          var privateFunc1 = function() {
+          };
+
+          var privateFunc2 = function() {
+          };
+
+          var privateFunc2 = function() {
+          };
+
+          return {
+            publicProperty : privatProp,
+            publicApiFunc1 : privateFunc2,
+            publicApiFunc2 : privateFunc3,
+          }
+        }())
+        </pre>
+      </article>
+
+      <article>
+        <h3>Function Injection Variation</h3>
+        <pre>
+          var modules = { Dropdown : dropdown_args,
+                          Header   : header_args,
+                          Footer   : footer_args }
+
+          for (module in modules) {
+            (function(args) {
+              var privateFunction = function() {
+                // private
+              };
+              var publicFunction = function() {
+                // public
+              };
+
+            }).apply(module, modules[module])
+          }
+        </pre>
+      </article>
+
+      <article>
+        <h4>Conclusions</h4>
+        <ul>
+          <li>Lots and lots of options</li>
+          <li>Code Clarity</li>
+          <li>Minifies well</li>
+          <li>Importing globals speeds look up<li>
+          <li>Initialization a tiny bit slower</li>
+          <li>No run time performance hit</li>
+        </ul>
+      </article>
+
+    </section>
+  </body>
+</html>
