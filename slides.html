@@ -100,13 +100,13 @@
           var Awesome = (function(self, $) {
             var marquee = $('<'+'marquee'+'>');
 
-            var makeItPink = function(el) {
+            self.makeItPink = function(el) {
               el.find("a, p, div").css("color", "#FFOCC");
             };
 
             self.pinkMarquee = function(selector) {
               $(selector).appendTo(marquee);
-              markeItPink(marquee);
+              self.markeItPink(marquee);
               return marquee;
             };
 
@@ -125,7 +125,7 @@
 
             self.pinkBlink = function(selector) {
               $(selector).appendTo(blink);
-              makeItPink(blink);
+              self.makeItPink(blink);
               return blink;
             };
             return self;
@@ -202,7 +202,7 @@
               var privateFunction = function() {
                 // private
               };
-              var publicFunction = function() {
+              module.publicFunction = function() {
                 // public
               };
 
